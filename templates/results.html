@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block body %}
+<h2>Enter Race Results</h2>
+<form method="post" class="row gy-2 gx-2 mb-4">
+  {% for n in (1,2,3) %}
+    <div class="col-auto">
+      <label class="form-label mb-0">{{n}}{% if n==1 %}st{% elif n==2 %}nd{% else %}rd{% endif %}</label>
+      <select name="p{{n}}" class="form-select">
+        {% for h in horses %}
+          <option value="{{h.id}}" {% if res and getattr(res, ['first_id','second_id','third_id'][n-1])==h.id %}selected{% endif %}>
+            {{h.name}}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endfor %}
+  <div class="col-auto align-self-end"><button class="btn btn-success">Save / Recalc</button></div>
+</form>
+
+{% if payouts %}
+  <h3>Payouts</h3>
+  <table class="table w-auto">
+    <thead><tr><th>Player</th><th class="text-end">Amount</th></tr></thead>
+    {% for name,amt in payouts.items() %}
+      <tr><td>{{name}}</td><td class="text-end">${{ '%.2f'|format(amt) }}</td></tr>
+    {% endfor %}
+  </table>
+{% endif %}
+<a href="{{url_for('dashboard')}}">← Back to board</a>
+{% endblock %}

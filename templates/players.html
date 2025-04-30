@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2 class="mb-4">Player Totals</h2>
+
+<table class="table table-striped w-auto">
+  <thead class="table-light">
+    <tr>
+      <th>Player</th>
+      <th class="text-end">Chips Bet</th>
+      <th class="text-end">$
+        {% if chip_value != 1 %} ({{ chip_value }}/chip){% endif %}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for name, chips in totals %}
+      <tr>
+        <td>{{ name }}</td>
+        <td class="text-end">{{ chips }}</td>
+        <td class="text-end">${{ '%.2f'|format(chips * chip_value) }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{{ url_for('dashboard') }}">← Back to board</a>
+{% endblock %}

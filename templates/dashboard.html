@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block body %}
+<h2>Betting Board</h2>
+
+<form method="post" class="row gx-2 gy-1 mb-4">
+  <div class="col-auto">
+    <select name="horse" class="form-select">
+      {% for h in horses %}<option value="{{h.id}}">{{ h.number}} - {{h.name}}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
+    <select name="pool" class="form-select">
+      <option value="WIN">Win</option><option value="PLC">Place</option><option value="SHW">Show</option>
+    </select>
+  </div>
+  <div class="col-auto"><input type="number" name="chips" value="1" min="1" class="form-control"></div>
+  <div class="col-auto"><button class="btn btn-success">Add Bet for {{player_name}}</button></div>
+</form>
+
+<table class="table table-bordered align-middle text-center">
+  <thead class="table-light"><tr><th>Horse</th><th>WIN</th><th>PLACE</th><th>SHOW</th></tr></thead>
+  <tbody>
+  {% for h in horses %}
+    <tr>
+      <td class="text-start">
+        <div class="horse-row">
+        <div class="silk-box">
+        <img src="{{ url_for('static',
+        filename='silks/' ~ h.name ~ '.png') }}"
+alt="{{ h.name }} silks"
+class="silk-img"></div><div class="horse-info">
+</h1>{{h.name}}</h1><p style="font-size: 0.7em;">{{h.jockey}}   {{h.odds}}</p></td></div></div>
+      
+      {% for pool in ('WIN','PLC','SHW') %}
+        <td>
+          {% for b in bets if b.horse_id==h.id and b.pool==pool %}
+            <span class="badge bg-secondary">{{ b.chips }} {{ players[b.player_id] if players else ''}}</span>
+          {% endfor %}
+        </td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<div class="mt-3">
+  <h5>Pool totals</h5>
+  <ul>
+    <li>WIN pool:  <strong>${{totals.WIN}}</strong></li>
+    <li>PLACE pool: <strong>${{totals.PLC}}</strong></li>
+    <li>SHOW pool:  <strong>${{totals.SHW}}</strong></li>
+  </ul>
+  <a class="btn btn-outline-primary" href="{{url_for('results')}}">Enter results</a>
+</div>
+{% endblock %}

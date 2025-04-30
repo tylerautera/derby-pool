@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
+  <div class="card shadow" style="max-width: 420px; width:100%;">
+    <div class="card-body p-4">
+      <!-- logo placeholder -->
+      <div class="text-center mb-4">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo-img" alt="Logo">
+      </div>
+      <h4 class="text-center mb-3">Join the Pool</h4>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label" for="name">Name</label>
+          <input required name="name" id="name" placeholder="Your name" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="code">Event Code</label>
+          <input  name="code" id="code" class="form-control"
+                  value="{{ default_code }}"
+                  {% if lock_code %}readonly{% endif %}
+                  placeholder="Event code">
+        </div>
+        <div class="d-grid">
+          <button class="btn btn-primary btn-lg">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
