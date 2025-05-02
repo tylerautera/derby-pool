@@ -210,6 +210,28 @@ def create_app():
     def pools():
         d = dict(_pool_totals())
         return {"WIN": d.get("WIN", 0), "PLC": d.get("PLC", 0), "SHW": d.get("SHW", 0)}
+    
+
+    @app.context_processor
+    def inject_venmo_link():
+        venmo_user   = os.getenv("VENMO_USER", "@greg_rothermel")
+        chip_value   = int(os.getenv("CHIP_VALUE", 1))
+        total_bet    = 0
+        if session.get("player_id"):
+            total_bet = (db.session.query(
+                            db.func.coalesce(db.func.sum(Bet.chips), 0))
+                        .filter(Bet.player_id == session["player_id"])
+                        .scalar() or 0) * chip_value
+
+        deeplink = (f"venmo://paycharge?txn=pay&recipients={venmo_user}"
+                    f"&amount={total_bet}&note=Derby%20Pool")
+        # fallback for desktop browsers
+        web_fallback = (f"https://venmo.com/{venmo_user}"
+                        f"?txn=pay&amount={total_bet}&note=Derby%20Pool")
+        return {
+            "my_total_bet": total_bet,
+            "venmo_deeplink": deeplink if total_bet else web_fallback
+        }
         
     admin = Admin(app, name="Derby Admin", template_mode="bootstrap4")
 
