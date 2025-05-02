@@ -214,7 +214,7 @@ def create_app():
 
     @app.context_processor
     def inject_venmo_link():
-        venmo_user   = os.getenv("VENMO_USER", "@greg_rothermel")
+        venmo_user   = os.getenv("VENMO_USER", "greg rothermel")
         chip_value   = int(os.getenv("CHIP_VALUE", 1))
         total_bet    = 0
         if session.get("player_id"):
