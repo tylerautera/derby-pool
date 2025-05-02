@@ -19,7 +19,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pool.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = secrets.token_hex(16)
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
     db.init_app(app)
 
     with app.app_context():
@@ -214,7 +214,7 @@ def create_app():
 
     @app.context_processor
     def inject_venmo_link():
-        venmo_user   = os.getenv("VENMO_USER", "greg rothermel")
+        venmo_user   = os.getenv("VENMO_USER", "greg-rothermel")
         chip_value   = int(os.getenv("CHIP_VALUE", 1))
         total_bet    = 0
         if session.get("player_id"):
