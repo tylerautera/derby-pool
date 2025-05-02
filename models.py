@@ -18,8 +18,8 @@ class Player(db.Model):
 
 class Bet(db.Model):
     id        = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey("player.id"))
-    horse_id  = db.Column(db.Integer, db.ForeignKey("horse.id"))
+    player_id = db.Column(db.Integer, db.ForeignKey("player.id",ondelete='CASCADE'))
+    horse_id  = db.Column(db.Integer, db.ForeignKey("horse.id",ondelete='CASCADE'))
     pool      = db.Column(db.String(3))          # WIN / PLC / SHW
     chips     = db.Column(db.Integer, default=1)
 

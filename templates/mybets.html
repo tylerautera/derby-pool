@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2 class="mb-3">My Bets</h2>
+<div class="list-group">
+  {% for bet, horse in bets %}
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+      <span>
+        {{ horse.name }} · {{ bet.pool }} · {{ bet.chips }} chips
+      </span>
+
+      <form method="post" class="m-0">
+        <input type="hidden" name="delete_id" value="{{ bet.id }}">
+        <button class="btn btn-sm btn-outline-danger">Delete</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="alert alert-info w-100">No bets yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

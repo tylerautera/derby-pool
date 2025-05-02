@@ -45,6 +45,10 @@
             <a class="nav-link{% if request.endpoint == 'dashboard' %} active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link{% if request.endpoint == 'mybets' %} active{% endif %}"
+               href="{{ url_for('mybets') }}">My Bets</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link{% if request.endpoint == 'players' %} active{% endif %}" href="{{ url_for('players') }}">Players</a>
           </li>
           {% if session.get('player_id') %}
