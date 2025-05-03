@@ -10,10 +10,15 @@ import pandas as pd, pathlib
 import re, unicodedata
 from flask import url_for, jsonify
 from datetime import datetime, timedelta
-import pytz
 from flask import abort
+import pytz, datetime as dt
+import hashlib, itertools
+load_dotenv()    
 
-load_dotenv()                                           # .env for local dev
+
+tz        = pytz.timezone("US/Central")
+POST_TIME = tz.localize(dt.datetime(2025, 5, 3, 18, 2)) 
+BETTING_CLOSES = POST_TIME - timedelta(minutes=5)                                       # .env for local dev
 
 def create_app():
     app = Flask(__name__)
@@ -92,14 +97,31 @@ def create_app():
             return redirect(url_for('dashboard'))
 
         player = Player.query.get(session['player_id'])
-        horses = Horse.query.order_by(Horse.number).all()
-        display_map = {
-            h.id: f"{h.number:02d} – {h.name} ({h.jockey}) │ {h.odds}" for h in horses
-        }
-        bets   = Bet.query.all()
-        totals = _totals_by_pool()
-        return render_template('dashboard.html',
-                               horses=horses, display_map=display_map, bets=bets, totals=totals,player_name=player.name)
+        horses_active = Horse.query.filter_by(scratched=False).order_by(Horse.number).all()
+        horses_all = Horse.query.order_by(Horse.number).all()
+
+        cell = {}   # {(horse_id, pool): {"total": $, "players": {name}}}
+        chip_value = int(os.getenv("CHIP_VALUE", 1))
+
+        q = (db.session.query(Bet.horse_id, Bet.pool,
+                            Player.name,
+                            db.func.sum(Bet.chips).label("chips"))
+            .join(Player, Player.id == Bet.player_id)
+            .group_by(Bet.horse_id, Bet.pool, Player.id))
+
+        for horse_id, pool, player_name, chips in q:
+            key = (horse_id, pool)
+            cell.setdefault(key, {"total": 0, "players": set()})
+            cell[key]["total"]   += chips * chip_value
+            cell[key]["players"].add(player_name)
+        totals = _totals_by_pool()  
+        return render_template("dashboard.html",
+                            horses_all=horses_all,
+                            horses_active=horses_active,
+                            cell=cell,
+                            totals=totals,
+                            initials=initials,
+                            pcolor=color_for_player)
 
     @app.route('/results', methods=['GET', 'POST'])
     def results():
@@ -123,7 +145,9 @@ def create_app():
     
     @app.route("/viz")
     def viz():
-        return render_template("viz.html")
+        post_epoch_ms = int(POST_TIME.timestamp() * 1000)
+        betting_closes = int(BETTING_CLOSES.timestamp() * 1000)  # JS wants ms
+        return render_template("viz.html", post_epoch_ms=post_epoch_ms, betting_closes=betting_closes)
     
     @app.route("/mybets", methods=["GET", "POST"])
     def mybets():
@@ -154,8 +178,9 @@ def create_app():
         players = [Player(name=player_name_from_index(i)) for i in range(people)]
         db.session.bulk_save_objects(players, return_defaults=True)   # ← fetch PKs
         db.session.flush()                                       # get primary keys
+        horses_active = Horse.query.filter_by(scratched=False).order_by(Horse.number).all()
 
-        horse_ids = [h.id for h in Horse.query.all()]
+        horse_ids = [h.id for h in horses_active]
         pools     = ["WIN", "PLC", "SHW"]
 
         # create random bets ------------------------------------------------------
@@ -258,7 +283,23 @@ def create_app():
 
 # ---------- helpers ----------
 
-POST_TIME = datetime(2025, 5, 3, 17, 24, tzinfo=pytz.timezone("US/Eastern"))
+# The official Kentucky Derby post time is 7:02 p.m. ET, May 3, 2025
+# POST_TIME = datetime(2025, 5, 3, 19, 02, tzinfo=pytz.timezone("US/Eastern"))
+
+COLORS = [
+    "#4e79a7", "#f28e2c", "#e15759",
+    "#76b7b2", "#59a14f", "#edc949",
+    "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"
+]
+
+def initials(name: str) -> str:
+    parts = name.strip().split()
+    return (parts[0][0] + (parts[-1][0] if len(parts) > 1 else "")).upper()
+
+def color_for_player(name: str) -> str:
+    # stable hash → palette index
+    idx = int(hashlib.sha1(name.encode()).hexdigest(), 16) % len(COLORS)
+    return COLORS[idx]
 
 
 def _pool_totals():
@@ -272,7 +313,7 @@ def slug(s):
     return re.sub(r'[^A-Za-z0-9]+', '_', s).strip('_').lower()
 
 def betting_open() -> bool:
-    return datetime.now(POST_TIME.tzinfo) < POST_TIME - timedelta(minutes=5)
+    return datetime.now(POST_TIME.tzinfo) < BETTING_CLOSES
 
 def require_betting_open():
     if not betting_open() and not session.get("is_admin"):

@@ -4,5 +4,6 @@ python-dotenv==1.0.1
 gunicorn==21.2.0
 pandas
 openpyxl
-flask-admin
+Flask-Admin==1.6.1
 pytz
+WTForms==2.3.3

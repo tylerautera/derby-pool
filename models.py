@@ -6,11 +6,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Horse(db.Model):
-    id      = db.Column(db.Integer, primary_key=True)
-    number  = db.Column(db.Integer, nullable=False, unique=True)
-    name    = db.Column(db.String(60), nullable=False)
-    jockey  = db.Column(db.String(60), nullable=False)
-    odds    = db.Column(db.String(60))                # use Float for 12.5-1 etc.
+    id       = db.Column(db.Integer, primary_key=True)
+    number   = db.Column(db.Integer, nullable=False, unique=True)
+    name     = db.Column(db.String(60), nullable=False)
+    jockey   = db.Column(db.String(60), nullable=False)
+    odds     = db.Column(db.String(10))
+    scratched = db.Column(db.Boolean, default=False)                 # use Float for 12.5-1 etc.
 
 class Player(db.Model):
     id   = db.Column(db.Integer, primary_key=True)

@@ -5,7 +5,7 @@
 <form method="post" class="row gx-2 gy-1 mb-4">
   <div class="col-auto">
     <select name="horse" class="form-select">
-      {% for h in horses %}<option value="{{h.id}}">{{ h.number}} - {{h.name}}</option>{% endfor %}
+      {% for h in horses_active %}<option value="{{h.id}}">{{ h.number}} - {{h.name}}</option>{% endfor %}
     </select>
   </div>
   <div class="col-auto">
@@ -20,24 +20,34 @@
 <table class="table table-bordered align-middle text-center">
   <thead class="table-light"><tr><th>Horse</th><th>WIN</th><th>PLACE</th><th>SHOW</th></tr></thead>
   <tbody>
-  {% for h in horses %}
-    <tr>
+  {% for h in horses_all %}
+  <tr class="{% if h.scratched %}scratched{% endif %}">
       <td class="text-start">
         <div class="horse-row">
         <div class="silk-box">
         <img src="{{ url_for('static',
         filename='silks/' ~ h.name ~ '.png') }}"
 alt="{{ h.name }} silks"
-class="silk-img"></div><div class="horse-info">
+class="silk-img {% if h.scratched %}scratched-faded{% endif %}"></div><div class="horse-info">
 </h1>{{h.name}}</h1><p style="font-size: 0.7em;">{{h.jockey}}   {{h.odds}}</p></td></div></div>
       
-      {% for pool in ('WIN','PLC','SHW') %}
-        <td>
-          {% for b in bets if b.horse_id==h.id and b.pool==pool %}
-            <span class="badge bg-secondary">{{ b.chips }} {{ players[b.player_id] if players else ''}}</span>
-          {% endfor %}
-        </td>
-      {% endfor %}
+{% for pool in ('WIN','PLC','SHW') %}
+{% set data = cell.get((h.id, pool)) %}
+<td class="text-center">
+  {% if data %}
+    <div class="row d-flex justify-content-center" style="font-size: 1.5em;">
+      ${{ data.total }}
+    </div>
+    
+    {% for name in data.players|sort %}
+      <span class="bettor-badge"
+            style="background-color: {{ pcolor(name) }}">
+        {{ initials(name) }}
+      </span>
+    {% endfor %}
+  {% endif %}
+</td>
+{% endfor %}
     </tr>
   {% endfor %}
   </tbody>

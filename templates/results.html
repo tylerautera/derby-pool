@@ -2,18 +2,17 @@
 {% block body %}
 <h2>Enter Race Results</h2>
 <form method="post" class="row gy-2 gx-2 mb-4">
-  {% for n in (1,2,3) %}
-    <div class="col-auto">
-      <label class="form-label mb-0">{{n}}{% if n==1 %}st{% elif n==2 %}nd{% else %}rd{% endif %}</label>
-      <select name="p{{n}}" class="form-select">
-        {% for h in horses %}
-          <option value="{{h.id}}" {% if res and getattr(res, ['first_id','second_id','third_id'][n-1])==h.id %}selected{% endif %}>
-            {{h.name}}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-  {% endfor %}
+  {% for n in (1, 2, 3) %}
+  {% set field = ['first_id', 'second_id', 'third_id'][n-1] %}
+  <select name="p{{ n }}" class="form-select">
+    {% for h in horses %}
+      <option value="{{ h.id }}"
+        {% if res and (res | attr(field)) == h.id %}selected{% endif %}>
+        {{ h.name }}
+      </option>
+    {% endfor %}
+  </select>
+{% endfor %}
   <div class="col-auto align-self-end"><button class="btn btn-success">Save / Recalc</button></div>
 </form>
 

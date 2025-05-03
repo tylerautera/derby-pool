@@ -19,13 +19,21 @@
     align-items: flex-start;
     gap: 8px;               /* space between columns */
   }
-
+  .scratched td { text-decoration: line-through; color:#a0a0a0; }
   .silk-box   { flex: 0 0 60px; }
   .silk-img   { width: 70px; height: auto; display:block; }
 
   .horse-info { flex: 1 1 220px; }   /* grow if space, but start at 220 px */
   .pool       { flex: 0 0 70px; text-align:center; }
   .logo-img { max-height: 250px;}
+  .scratched-faded {
+    opacity: 0.4;   /* 0 = fully transparent, 1 = fully opaque */
+  }
+  .bettor-badge{
+     color:#fff; font-weight:600; font-size:.8rem;
+     padding:.2rem .4rem; margin-left:.25rem; margin-top:.25rem; border-radius:.4rem;
+     display:inline-block;
+  }
   </style>
 </head>
 <body class="p-4">
