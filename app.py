@@ -119,6 +119,7 @@ def create_app():
                             horses_all=horses_all,
                             horses_active=horses_active,
                             cell=cell,
+                            player_name=player.name,
                             totals=totals,
                             initials=initials,
                             pcolor=color_for_player)
