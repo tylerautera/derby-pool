@@ -5,7 +5,7 @@
   {% for bet, horse in bets %}
     <div class="list-group-item d-flex justify-content-between align-items-center">
       <span>
-        {{ horse.name }} · {{ bet.pool }} · {{ bet.chips }} chips
+        {{ horse.name }} · {{ bet.pool }} · ${{ bet.chips }} 
       </span>
 
       <form method="post" class="m-0">

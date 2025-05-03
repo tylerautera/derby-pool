@@ -13,7 +13,17 @@
       <option value="WIN">Win</option><option value="PLC">Place</option><option value="SHW">Show</option>
     </select>
   </div>
-  <div class="col-auto"><input type="number" name="chips" value="1" min="1" class="form-control"></div>
+  <div class="col-auto">
+    <div class="input-group">
+      <span class="input-group-text">$</span>
+      <input type="number"
+             name="chips"
+             min="1"
+             value="1"
+             class="form-control"
+             aria-label="Amount in dollars">
+    </div>
+  </div>
   <div class="col-auto"><button class="btn btn-success">Add Bet for {{player_name}}</button></div>
 </form>
 
